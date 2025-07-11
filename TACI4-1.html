@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bloque 4 – Motivación y Autonomía</title>
+  <style>
+    body {
+      background-color: #fff9ec;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .question {
+      margin-bottom: 2rem;
+    }
+    .question h3 {
+      font-size: 1.25rem;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #f7f7f7;
+    }
+    .btn.selected {
+      background-color: #d1e7dd;
+      border-color: #0f5132;
+      color: #0f5132;
+      font-weight: bold;
+    }
+    .navigation-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+    .navigation-buttons button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .navigation-buttons button:first-child {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+    .navigation-buttons button:last-child {
+      background-color: #ffc107;
+      color: #333;
+    }
+    #counter {
+      text-align: right;
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div id="counter"></div>
+    <h2>🚀 Bloque 4: Motivación y Autonomía</h2>
+    <div class="question" id="pregunta">
+      </div>
+    <div class="navigation-buttons">
+      <button onclick="anterior()">Anterior</button>
+      <button onclick="siguiente()">Siguiente</button>
+    </div>
+  </div>
+
+  <script>
+    const bloqueActual = 4; // ¡IMPORTANTE: Definimos el número de bloque!
+    const grupo = localStorage.getItem('grupoEtario');
+
+    // Si el grupo etario no está en localStorage (ej. llegó directamente), redirigir al inicio
+    if (!grupo) {
+        window.location.href = 'index.html';
+    }
+
+    const preguntas = {
+      ninos: [
+        {
+          texto: "¿Tu hijo/a muestra una gran persistencia cuando se enfrenta a desafíos que le interesan?",
+          opciones: [
+            "1 - Se rinde fácilmente.",
+            "2 - A veces insiste un poco.",
+            "3 - Sí, trabaja duro en cosas que le motivan.",
+            "4 - No se detiene hasta dominar una habilidad o resolver un problema que le apasiona.",
+            "5 - Su tenacidad es excepcional; no hay obstáculo que lo detenga cuando está comprometido/a."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a prefiere aprender por sí mismo/a o explorar sus intereses de forma autónoma?",
+          opciones: [
+            "1 - Prefiere que le enseñen.",
+            "2 - A veces explora por su cuenta.",
+            "3 - Sí, le gusta descubrir cosas por sí mismo/a.",
+            "4 - Disfruta mucho del aprendizaje autodirigido y la investigación personal.",
+            "5 - Es intrínsecamente motivado/a y autodidacta en gran medida, sin necesidad de supervisión."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a tiene una fuerte motivación interna para lograr sus metas, más allá de las recompensas externas?",
+          opciones: [
+            "1 - Necesita recompensas para motivarse.",
+            "2 - A veces se motiva por sí mismo/a.",
+            "3 - Sí, se esfuerza por satisfacción personal.",
+            "4 - Sus logros son impulsados por su deseo de superación, no por premios o notas.",
+            "5 - Su motor es puramente interno; persigue sus pasiones con una dedicación asombrosa."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a se recupera rápidamente de los fracasos y los ve como oportunidades para aprender?",
+          opciones: [
+            "1 - Le cuesta mucho recuperarse.",
+            "2 - A veces se anima rápido.",
+            "3 - Sí, tiende a ver los errores como lecciones.",
+            "4 - Tiene una notable resiliencia y aprende constructivamente de sus errores.",
+            "5 - El fracaso es solo un escalón para su siguiente intento; su capacidad de resiliencia es admirable."
+          ]
+        }
+      ],
+      adolescentes: [
+        {
+          texto: "¿Muestras una gran persistencia y determinación en proyectos que te interesan, a pesar de las dificultades?",
+          opciones: [
+            "1 - Me rindo fácilmente.",
+            "2 - A veces persisto un poco.",
+            "3 - Sí, soy bastante persistente en lo que me importa.",
+            "4 - Tengo una tenacidad notable para alcanzar mis objetivos, superando obstáculos.",
+            "5 - Mi determinación es inquebrantable; no me detengo hasta lograr lo que me propongo."
+          ]
+        },
+        {
+          texto: "¿Prefieres aprender por tu cuenta, investigar o desarrollar proyectos sin necesidad de guía constante?",
+          opciones: [
+            "1 - Necesito mucha guía.",
+            "2 - A veces busco por mi cuenta.",
+            "3 - Sí, disfruto del aprendizaje autodirigido.",
+            "4 - Soy proactivo/a en mi aprendizaje, buscando recursos y creando mis propios proyectos.",
+            "5 - Mi autonomía en el aprendizaje y la investigación es total; soy mi propio maestro."
+          ]
+        },
+        {
+          texto: "¿Tu motivación para el estudio o tus proyectos viene de un interés interno, más que de calificaciones o reconocimientos?",
+          opciones: [
+            "1 - Me motivo por las notas o premios.",
+            "2 - A veces es por interés personal.",
+            "3 - Sí, mi curiosidad interna me impulsa a aprender.",
+            "4 - Busco el conocimiento y la maestría por el placer de aprender en sí mismo.",
+            "5 - Mi motor principal es la pasión y el deseo de comprender, sin importar las recompensas externas."
+          ]
+        },
+        {
+          texto: "¿Te recuperas rápidamente de los reveses o errores y los utilizas para mejorar?",
+          opciones: [
+            "1 - Me cuesta mucho superar los errores.",
+            "2 - A veces los analizo.",
+            "3 - Sí, intento aprender de mis fallos y seguir adelante.",
+            "4 - Veo cada error como una valiosa oportunidad para crecer y ajustar mi estrategia.",
+            "5 - Mi resiliencia es una de mis mayores fortalezas; los errores solo me hacen más fuerte."
+          ]
+        }
+      ],
+      adultos: [
+        {
+          texto: "¿Muestras una gran persistencia y determinación en proyectos o metas que te interesan, a pesar de las dificultades?",
+          opciones: [
+            "1 - Me rindo fácilmente.",
+            "2 - A veces persisto un poco.",
+            "3 - Sí, soy bastante persistente en lo que me importa.",
+            "4 - Tengo una tenacidad notable para alcanzar mis objetivos, superando obstáculos.",
+            "5 - Mi determinación es inquebrantable; no me detengo hasta lograr lo que me propongo."
+          ]
+        },
+        {
+          texto: "¿Prefieres aprender por tu cuenta, investigar o desarrollar proyectos sin necesidad de guía constante?",
+          opciones: [
+            "1 - Necesito mucha guía.",
+            "2 - A veces busco por mi cuenta.",
+            "3 - Sí, disfruto del aprendizaje autodirigido.",
+            "4 - Soy proactivo/a en mi aprendizaje, buscando recursos y creando mis propios proyectos.",
+            "5 - Mi autonomía en el aprendizaje y la investigación es total; soy mi propio maestro."
+          ]
+        },
+        {
+          texto: "¿Tu motivación para el aprendizaje o tus proyectos viene de un interés interno, más que de factores externos (salario, reconocimiento)?",
+          opciones: [
+            "1 - Me motivo por factores externos.",
+            "2 - A veces es por interés personal.",
+            "3 - Sí, mi curiosidad interna me impulsa a aprender y crecer.",
+            "4 - Busco el conocimiento y la maestría por el placer de aprender en sí mismo, sin importar las recompensas.",
+            "5 - Mi motor principal es la pasión y el deseo de comprender profundamente, sin importar lo externo."
+          ]
+        },
+        {
+          texto: "¿Eres capaz de autogestionar tu propio proceso de aprendizaje o superación personal sin depender de estructuras externas?",
+          opciones: [
+            "1 - Necesito orientación externa.",
+            "2 - Me guío parcialmente solo.",
+            "3 - Puedo avanzar por mi cuenta si tengo motivación.",
+            "4 - Diseñé mis propias rutinas de aprendizaje o trabajo personal.",
+            "5 - Desde siempre funciono con total autonomía para aprender y superarme."
+          ]
+        }
+      ]
+    };
+
+    let indice = 0;
+    const respuestas = Array(4).fill(0); // 4 preguntas por bloque para niños, adolescentes, adultos.
+
+    function mostrarPregunta() {
+      const cont = document.getElementById("pregunta");
+      const actual = preguntas[grupo][indice];
+      let html = `<h3>${actual.texto}</h3>`;
+      actual.opciones.forEach((op, i) => {
+        html += `<button class="btn ${respuestas[indice] === i + 1 ? 'selected' : ''}" onclick="seleccionar(${i + 1})">${op}</button>`;
+      });
+      cont.innerHTML = html;
+      document.getElementById("counter").innerText = `Pregunta ${indice + 1} de ${preguntas[grupo].length}`;
+    }
+
+    function seleccionar(valor) {
+      respuestas[indice] = valor;
+      mostrarPregunta(); // Vuelve a mostrar para actualizar el estado "selected"
+    }
+
+    function siguiente() {
+    // Si todavía quedan preguntas en este bloque
+    if (indice < preguntas[grupo].length - 1) {
+        indice++; // Avanza a la siguiente pregunta
+        mostrarPregunta(); // Muestra la nueva pregunta
+    } else {
+        // Si ya no quedan más preguntas en este bloque:
+        // Paso 1: Guardamos las respuestas de este bloque en localStorage.
+        // Usamos un nombre único para cada bloque, como 'respuestasBloque1', 'respuestasBloque2', etc.
+        localStorage.setItem(`respuestasBloque${bloqueActual}`, JSON.stringify(respuestas));
+        // JSON.stringify() convierte nuestras respuestas (que son un array) en texto que localStorage puede guardar.
+
+        // Paso 2: Redirigimos al usuario al siguiente bloque.
+        window.location.href = `TACI${bloqueActual + 1}-1.html`;
+    }
+}
+
+    function anterior() {
+      if (indice > 0) {
+        indice--;
+        mostrarPregunta();
+      } else {
+        // Si no hay preguntas anteriores en este bloque, regresamos al bloque anterior
+        // o a la página de inicio si estamos en el primer bloque.
+        if (bloqueActual > 1) {
+          window.location.href = `TACI${bloqueActual - 1}-1.html`;
+        } else {
+          window.location.href = 'index.html'; // Si es el bloque 1, regresa al inicio.
+        }
+      }
+    }
+
+    // Al cargar la página, muestra la primera pregunta
+    window.onload = mostrarPregunta;
+  </script>
+
+</body>
+</html>

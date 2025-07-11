@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bloque 3 – Socioemocional</title>
+  <style>
+    body {
+      background-color: #fff9ec;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .question {
+      margin-bottom: 2rem;
+    }
+    .question h3 {
+      font-size: 1.25rem;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #f7f7f7;
+    }
+    .btn.selected {
+      background-color: #d1e7dd;
+      border-color: #0f5132;
+      color: #0f5132;
+      font-weight: bold;
+    }
+    .navigation-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+    .navigation-buttons button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .navigation-buttons button:first-child {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+    .navigation-buttons button:last-child {
+      background-color: #ffc107;
+      color: #333;
+    }
+    #counter {
+      text-align: right;
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div id="counter"></div>
+    <h2>❤️ Bloque 3: Socioemocional </h2>
+    <div class="question" id="pregunta">
+      </div>
+    <div class="navigation-buttons">
+      <button onclick="anterior()">Anterior</button>
+      <button onclick="siguiente()">Siguiente</button>
+    </div>
+  </div>
+
+  <script>
+    const bloqueActual = 3; // ¡IMPORTANTE: Definimos el número de bloque!
+    const grupo = localStorage.getItem('grupoEtario');
+
+    // Si el grupo etario no está en localStorage (ej. llegó directamente), redirigir al inicio
+    if (!grupo) {
+        window.location.href = 'index.html';
+    }
+
+    const preguntas = {
+      ninos: [
+        {
+          texto: "¿Tu hijo/a tiene una gran sensibilidad emocional, notando fácilmente los sentimientos de los demás?",
+          opciones: [
+            "1 - No, es como los demás.",
+            "2 - A veces muestra más empatía.",
+            "3 - Sí, es muy empático/a y se preocupa por los demás.",
+            "4 - Demuestra una comprensión profunda de las emociones, propias y ajenas.",
+            "5 - Su sensibilidad es muy alta, a veces lo abruma la injusticia o el dolor ajeno."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a se frustra o se aburre fácilmente si una tarea no es lo suficientemente desafiante o significativa?",
+          opciones: [
+            "1 - No, se adapta bien.",
+            "2 - A veces le pasa con tareas fáciles.",
+            "3 - Sí, necesita desafíos constantes para mantenerse motivado/a.",
+            "4 - Se desmotiva rápidamente con lo repetitivo o lo que no tiene un propósito claro.",
+            "5 - Si no es un reto o no le interesa profundamente, se niega a hacerlo o lo hace con desgano."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a tiene una fuerte conciencia social o preocupación por temas de justicia y equidad?",
+          opciones: [
+            "1 - No es algo que le preocupe.",
+            "2 - A veces comenta sobre injusticias.",
+            "3 - Sí, muestra preocupación por lo que es justo o injusto.",
+            "4 - Tiene un sentido muy desarrollado de la justicia y defiende a quienes lo necesitan.",
+            "5 - Es un/a defensor/a apasionado/a de la equidad y la ética, incluso desde pequeño/a."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a se autoexige mucho o busca la perfección en lo que hace?",
+          opciones: [
+            "1 - No, no se preocupa por la perfección.",
+            "2 - A veces le gusta hacer las cosas bien.",
+            "3 - Sí, es muy autocrítico/a y busca mejorar constantemente.",
+            "4 - Se impone altos estándares y se frustra si no los alcanza.",
+            "5 - Su autoexigencia puede ser abrumadora, siempre buscando la excelencia absoluta."
+          ]
+        }
+      ],
+      adolescentes: [
+        {
+          texto: "¿Sientes las emociones de forma muy intensa (tanto las positivas como las negativas)?",
+          opciones: [
+            "1 - Mis emociones son estables.",
+            "2 - A veces me siento más intenso/a.",
+            "3 - Sí, experimento un amplio rango de emociones con gran profundidad.",
+            "4 - Mis estados emocionales son muy vívidos y a veces me siento 'demasiado' sensible.",
+            "5 - La intensidad de mis emociones es abrumadora; vivo todo con máxima pasión o dolor."
+          ]
+        },
+        {
+          texto: "¿Te sientes fácilmente frustrado/a o aburrido/a si las tareas o clases no son lo suficientemente desafiantes?",
+          opciones: [
+            "1 - Me adapto a lo que hay.",
+            "2 - A veces me aburro con lo fácil.",
+            "3 - Sí, necesito desafíos intelectuales constantes para mantenerme motivado/a.",
+            "4 - La repetición o la falta de propósito me desmotivan profundamente.",
+            "5 - El aburrimiento es mi mayor enemigo; necesito estimulación constante o me desconecto."
+          ]
+        },
+        {
+          texto: "¿Tienes un fuerte sentido de la justicia y te indignas fácilmente ante las injusticias sociales o personales?",
+          opciones: [
+            "1 - No es algo que me quite el sueño.",
+            "2 - A veces me molesta la injusticia.",
+            "3 - Sí, me preocupo mucho por lo que es justo y correcto.",
+            "4 - Soy un/a defensor/a activo/a de la justicia y los derechos, incluso en mi entorno cercano.",
+            "5 - La injusticia me consume; siento una profunda necesidad de luchar por un mundo más equitativo."
+          ]
+        },
+        {
+          texto: "¿Eres muy autocrítico/a y te exiges alcanzar altos estándares en todo lo que haces?",
+          opciones: [
+            "1 - No me preocupo mucho por la perfección.",
+            "2 - Me gusta hacer las cosas bien, pero sin obsesión.",
+            "3 - Sí, soy bastante exigente conmigo mismo/a.",
+            "4 - Me impongo estándares muy altos y me frustro si no los cumplo.",
+            "5 - Mi autoexigencia puede ser paralizante; siempre busco la excelencia en cada detalle."
+          ]
+        }
+      ],
+      adultos: [
+        {
+          texto: "¿Sientes las emociones de forma muy intensa (tanto las positivas como las negativas)?",
+          opciones: [
+            "1 - Mis emociones son estables.",
+            "2 - A veces me siento más intenso/a.",
+            "3 - Sí, experimento un amplio rango de emociones con gran profundidad.",
+            "4 - Mis estados emocionales son muy vívidos y a veces me siento 'demasiado' sensible.",
+            "5 - La intensidad de mis emociones es abrumadora; vivo todo con máxima pasión o dolor."
+          ]
+        },
+        {
+          texto: "¿Te sientes fácilmente frustrado/a o aburrido/a si las tareas o proyectos no son lo suficientemente desafiantes?",
+          opciones: [
+            "1 - Me adapto a lo que hay.",
+            "2 - A veces me aburro con lo fácil.",
+            "3 - Sí, necesito desafíos intelectuales constantes para mantenerme motivado/a.",
+            "4 - La repetición o la falta de propósito me desmotivan profundamente en el trabajo o estudios.",
+            "5 - El aburrimiento es mi mayor enemigo; necesito estimulación constante o me desconecto."
+          ]
+        },
+        {
+          texto: "¿Tienes un fuerte sentido de la justicia y te indignas fácilmente ante las injusticias sociales o personales?",
+          opciones: [
+            "1 - No es algo que me quite el sueño.",
+            "2 - A veces me molesta la injusticia.",
+            "3 - Sí, me preocupo mucho por lo que es justo y correcto.",
+            "4 - Soy un/a defensor/a activo/a de la justicia y los derechos, siempre buscando la equidad.",
+            "5 - La injusticia me consume; siento una profunda necesidad de luchar por un mundo más equitativo."
+          ]
+        },
+        {
+          texto: "¿Tus decisiones suelen estar motivadas por principios éticos o morales profundos?",
+          opciones: [
+            "1 - Me guío más por lo práctico.",
+            "2 - A veces, según el contexto.",
+            "3 - Intento ser justo/a en lo que hago.",
+            "4 - Mis valores determinan muchas de mis elecciones.",
+            "5 - Mi vida está orientada por ideales éticos y morales innegociables."
+          ]
+        }
+      ]
+    };
+
+    let indice = 0;
+    const respuestas = Array(4).fill(0); // 4 preguntas por bloque para niños, adolescentes, adultos.
+
+    function mostrarPregunta() {
+      const cont = document.getElementById("pregunta");
+      const actual = preguntas[grupo][indice];
+      let html = `<h3>${actual.texto}</h3>`;
+      actual.opciones.forEach((op, i) => {
+        html += `<button class="btn ${respuestas[indice] === i + 1 ? 'selected' : ''}" onclick="seleccionar(${i + 1})">${op}</button>`;
+      });
+      cont.innerHTML = html;
+      document.getElementById("counter").innerText = `Pregunta ${indice + 1} de ${preguntas[grupo].length}`;
+    }
+
+    function seleccionar(valor) {
+      respuestas[indice] = valor;
+      mostrarPregunta(); // Vuelve a mostrar para actualizar el estado "selected"
+    }
+
+    function siguiente() {
+    // Si todavía quedan preguntas en este bloque
+    if (indice < preguntas[grupo].length - 1) {
+        indice++; // Avanza a la siguiente pregunta
+        mostrarPregunta(); // Muestra la nueva pregunta
+    } else {
+        // Si ya no quedan más preguntas en este bloque:
+        // Paso 1: Guardamos las respuestas de este bloque en localStorage.
+        // Usamos un nombre único para cada bloque, como 'respuestasBloque1', 'respuestasBloque2', etc.
+        localStorage.setItem(`respuestasBloque${bloqueActual}`, JSON.stringify(respuestas));
+        // JSON.stringify() convierte nuestras respuestas (que son un array) en texto que localStorage puede guardar.
+
+        // Paso 2: Redirigimos al usuario al siguiente bloque.
+        window.location.href = `TACI${bloqueActual + 1}-1.html`;
+    }
+}
+
+    function anterior() {
+      if (indice > 0) {
+        indice--;
+        mostrarPregunta();
+      } else {
+        // Si no hay preguntas anteriores en este bloque, regresamos al bloque anterior
+        // o a la página de inicio si estamos en el primer bloque.
+        if (bloqueActual > 1) {
+          window.location.href = `TACI${bloqueActual - 1}-1.html`;
+        } else {
+          window.location.href = 'index.html'; // Si es el bloque 1, regresa al inicio.
+        }
+      }
+    }
+
+    // Al cargar la página, muestra la primera pregunta
+    window.onload = mostrarPregunta;
+  </script>
+
+</body>
+</html>

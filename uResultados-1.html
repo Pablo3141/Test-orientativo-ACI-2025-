@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Resultado Test ACI</title>
+
+  <style>
+    body {
+      background: #fff9ec;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+      color: #333;
+    }
+    .result-box, .mitos-realidad, .bloque-resultado-box {
+      background-color: #fffde8;
+      border: 1px solid #ffe58a;
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .result-box h2, .mitos-realidad h3, .bloque-resultado-box h4 {
+      color: #333;
+      margin-top: 0;
+    }
+    button {
+      margin-top: 1rem;
+      padding: 0.75rem 1rem;
+      border: none;
+      background: #ffc107;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #333;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #e0a800;
+    }
+    .bloque-individual-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="result-box">
+    <h2>📊 Resultado General del Test</h2>
+    <p><strong>Puntaje total estimado:</strong> <span id="puntaje-total"></span> puntos</p>
+    <div id="interpretacion-final">
+      </div>
+  </div>
+
+  <div class="bloque-individual-container" id="resultados-por-bloque">
+    </div>
+
+  <div class="mitos-realidad">
+    <h3>ℹ️ ¿Qué son (y qué no son) las Altas Capacidades?</h3>
+    <ul>
+      <li>✅ Las ACI no se definen solo por sacar buenas notas.</li>
+      <li>✅ Pueden coexistir con TDAH, TEA, dislexia, ansiedad, etc.</li>
+      <li>❌ No implican siempre éxito académico o social.</li>
+      <li>❌ No todas las personas ACI quieren destacar o competir.</li>
+      <li>✅ Muchas personas ACI pasan desapercibidas por años.</li>
+      <li>✅ Necesitan comprensión, estimulación adecuada y libertad de pensamiento.</li>
+    </ul>
+  </div>
+
+  <button onclick="guardarResultadoEnPDF()">📄 Descargar resultado en PDF</button>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    // Función para calcular el puntaje total sumando los puntajes de todos los bloques
+    function calcularPuntajeTotal() {
+      let puntajeTotal = 0;
+      for (let i = 1; i <= 6; i++) {
+        const respuestasBloqueStr = localStorage.getItem(`respuestasBloque${i}`);
+        if (respuestasBloqueStr) {
+          const respuestasBloque = JSON.parse(respuestasBloqueStr);
+          // Suma los valores de las respuestas de cada bloque
+          puntajeTotal += respuestasBloque.reduce((acc, curr) => acc + curr, 0);
+        }
+      }
+      return puntajeTotal;
+    }
+
+    // Función para obtener la interpretación final basada en el puntaje total
+    function obtenerInterpretacion(puntaje) {
+      // Estos rangos y textos son ejemplos. Ajusta según tus criterios.
+      if (puntaje >= 120) {
+        return "🚀 Alta probabilidad de Altas Capacidades Intelectuales. Tu perfil sugiere un potencial elevado que podría necesitar atención especializada.";
+      } else if (puntaje >= 90) {
+        return "💡 Indicadores a explorar de Altas Capacidades Intelectuales. Podrías explorar más a fondo ciertos aspectos de tu potencial.";
+      } else {
+        return "🌱 No se detectan indicadores significativos de Altas Capacidades Intelectuales en este test. Recuerda que este es solo un instrumento orientativo.";
+      }
+    }
+
+    // Nuevas funciones para puntaje e interpretación por bloque
+    function calcularPuntajeBloque(bloqueNum) {
+      const respuestasBloqueStr = localStorage.getItem(`respuestasBloque${bloqueNum}`);
+      if (respuestasBloqueStr) {
+        const respuestasBloque = JSON.parse(respuestasBloqueStr);
+        return respuestasBloque.reduce((acc, curr) => acc + curr, 0);
+      }
+      return 0; // Si no hay respuestas, el puntaje es 0
+    }
+
+    function obtenerInterpretacionBloque(bloqueNum, puntajeBloque) {
+      let interpretacion = "";
+      let categoria = "";
+      // Rangos de ejemplo para cada bloque. Puedes ajustarlos.
+      const maxPuntajePorPregunta = 5; // Asumiendo que la máxima puntuación por pregunta es 5
+      let numPreguntas = 0;
+
+      // Determinamos el número de preguntas por bloque para calcular el puntaje máximo por bloque
+      // Estos valores deben coincidir con la cantidad de preguntas en tus archivos TACIx-1.html
+      switch (bloqueNum) {
+        case 1: // Cognición
+          numPreguntas = 5; // Hay 5 preguntas en TACI1-1.html
+          categoria = "Cognición";
+          break;
+        case 2: // Creatividad
+          numPreguntas = 5; // Hay 5 preguntas en TACI2-1.html
+          categoria = "Creatividad";
+          break;
+        case 3: // Socioemocional
+          numPreguntas = 4; // Hay 4 preguntas en TACI3-1.html
+          categoria = "Socioemocional";
+          break;
+        case 4: // Motivación y Autonomía
+          numPreguntas = 4; // Hay 4 preguntas en TACI4-1.html
+          categoria = "Motivación y Autonomía";
+          break;
+        case 5: // Escolaridad / Sistema educativo-laboral
+          numPreguntas = 4; // Hay 4 preguntas en TACI5-1.html
+          categoria = "Escolaridad / Sistema educativo-laboral";
+          break;
+        case 6: // Doble y Triple Excepcionalidad
+          numPreguntas = 4; // Hay 4 preguntas en TACI6-1.html
+          categoria = "Doble y Triple Excepcionalidad";
+          break;
+        default:
+          return { categoria: "Desconocido", interpretacion: "Bloque desconocido." };
+      }
+
+      const puntajeMaxBloque = numPreguntas * maxPuntajePorPregunta;
+      
+      // Ajusta los umbrales de interpretación según tus criterios para cada bloque
+      if (puntajeBloque >= puntajeMaxBloque * 0.8) { // 80% o más
+        interpretacion = "Nivel muy alto en esta área.";
+      } else if (puntajeBloque >= puntajeMaxBloque * 0.6) { // 60% o más
+        interpretacion = "Nivel alto en esta área.";
+      } else if (puntajeBloque >= puntajeMaxBloque * 0.4) { // 40% o más
+        interpretacion = "Nivel medio en esta área.";
+      } else {
+        interpretacion = "Nivel a explorar en esta área.";
+      }
+      return { categoria: categoria, interpretacion: interpretacion };
+    }
+
+    // Esta parte del código se ejecuta automáticamente cuando la página de resultados se carga
+    window.onload = function() {
+      const puntajeTotal = calcularPuntajeTotal();
+      document.getElementById('puntaje-total').innerText = puntajeTotal;
+      document.getElementById('interpretacion-final').innerText = obtenerInterpretacion(puntajeTotal);
+
+      // Mostrar resultados por cada bloque
+      const resultadosPorBloqueDiv = document.getElementById('resultados-por-bloque');
+      for (let i = 1; i <= 6; i++) {
+        const puntajeBloque = calcularPuntajeBloque(i);
+        const { categoria, interpretacion } = obtenerInterpretacionBloque(i, puntajeBloque);
+
+        const bloqueResultadoBox = document.createElement('div');
+        bloqueResultadoBox.className = 'bloque-resultado-box';
+        bloqueResultadoBox.innerHTML = `
+          <h4>${categoria}</h4>
+          <p>Puntaje: <strong>${puntajeBloque}</strong></p>
+          <p>${interpretacion}</p>
+        `;
+        resultadosPorBloqueDiv.appendChild(bloqueResultadoBox);
+      }
+
+      // Limpia las respuestas de localStorage una vez que se muestran los resultados
+      // Descomenta estas líneas si quieres que el test se reinicie cada vez que se ve el resultado
+      // for (let i = 1; i <= 6; i++) {
+      //   localStorage.removeItem(`respuestasBloque${i}`);
+      // }
+      // localStorage.removeItem('grupoEtario');
+    };
+
+    // La función guardarResultadoEnPDF() ya estaba en tu código original,
+    // la hemos mantenido intacta si no te di instrucciones para modificarla.
+    // Esta función usa una librería para crear PDFs, no necesitas entenderla en detalle por ahora.
+    // Solo asegúrate de que esté ANTES de este nuevo script si no la moviste.
+    function guardarResultadoEnPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+
+      doc.setFontSize(16);
+      doc.text("Resultado del Test de Altas Capacidades", 10, 10);
+
+      // Captura el texto de la caja de resultados y los mitos/realidades
+      const textoResultadosGenerales = document.querySelector('.result-box').innerText;
+      let textoBloquesIndividuales = "";
+      const bloquesResultados = document.querySelectorAll('.bloque-resultado-box');
+      bloquesResultados.forEach(bloque => {
+        textoBloquesIndividuales += bloque.innerText + "\n\n";
+      });
+      const textoMitosRealidades = document.querySelector('.mitos-realidad').innerText;
+
+      const textoCompleto = textoResultadosGenerales + '\n\n' + textoBloquesIndividuales + '\n\n' + textoMitosRealidades;
+
+      doc.setFontSize(12);
+      // Dividir el texto para que quepa en múltiples páginas si es necesario
+      const splitText = doc.splitTextToSize(textoCompleto, 180); // Ancho máximo de 180mm
+      doc.text(splitText, 10, 20); // Empieza en Y=20 para dejar espacio al título
+      
+      doc.save("Resultado_Test_ACI.pdf");
+    }
+  </script>
+</body>
+</html>

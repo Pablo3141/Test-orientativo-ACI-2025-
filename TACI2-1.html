@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bloque 2 – Creatividad</title>
+  <style>
+    body {
+      background-color: #fff9ec;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .question {
+      margin-bottom: 2rem;
+    }
+    .question h3 {
+      font-size: 1.25rem;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #f7f7f7;
+    }
+    .btn.selected {
+      background-color: #d1e7dd;
+      border-color: #0f5132;
+      color: #0f5132;
+      font-weight: bold;
+    }
+    .navigation-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+    .navigation-buttons button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .navigation-buttons button:first-child {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+    .navigation-buttons button:last-child {
+      background-color: #ffc107;
+      color: #333;
+    }
+    #counter {
+      text-align: right;
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div id="counter"></div>
+    <h2>✨ Bloque 2: Creatividad </h2>
+    <div class="question" id="pregunta">
+      </div>
+    <div class="navigation-buttons">
+      <button onclick="anterior()">Anterior</button>
+      <button onclick="siguiente()">Siguiente</button>
+    </div>
+  </div>
+
+  <script>
+    const bloqueActual = 2; // ¡IMPORTANTE: Definimos el número de bloque!
+    const grupo = localStorage.getItem('grupoEtario');
+
+    // Si el grupo etario no está en localStorage (ej. llegó directamente), redirigir al inicio
+    if (!grupo) {
+        window.location.href = 'index.html';
+    }
+
+    const preguntas = {
+      ninos: [
+        {
+          texto: "¿Tu hijo/a inventa juegos, historias o soluciones originales a problemas cotidianos?",
+          opciones: [
+            "1 - No más que cualquier niño/a.",
+            "2 - A veces es creativo/a en sus juegos.",
+            "3 - Sí, con frecuencia crea cosas nuevas y originales.",
+            "4 - Tiene una imaginación desbordante y siempre encuentra formas inusuales de hacer las cosas.",
+            "5 - Su originalidad es sorprendente, siempre piensa fuera de la caja."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a muestra interés en las artes (dibujo, música, escritura, teatro) y lo hace de manera no convencional?",
+          opciones: [
+            "1 - Su interés es normal.",
+            "2 - Le gusta el arte, pero no de forma destacada.",
+            "3 - Sí, se sumerge en las artes con una expresión única.",
+            "4 - Demuestra un talento o enfoque inusual en alguna forma artística.",
+            "5 - Su expresión artística es innovadora y muy personal, superando las técnicas convencionales."
+          ]
+        },
+        {
+          texto: "¿Es tu hijo/a flexible en su pensamiento, adaptándose a nuevas ideas o cambiando de perspectiva fácilmente?",
+          opciones: [
+            "1 - Le cuesta cambiar de opinión o ideas.",
+            "2 - A veces se adapta.",
+            "3 - Sí, puede ver las cosas desde diferentes puntos de vista.",
+            "4 - Es muy flexible mentalmente, disfruta explorando múltiples soluciones.",
+            "5 - Su pensamiento es increíblemente ágil, siempre abierto a nuevas posibilidades."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a tiene un sentido del humor peculiar, juegos de palabras o chistes elaborados?",
+          opciones: [
+            "1 - Su humor es simple.",
+            "2 - A veces hace chistes ingeniosos.",
+            "3 - Sí, tiene un sentido del humor agudo y original para su edad.",
+            "4 - Su ingenio verbal es notable, con juegos de palabras y humor complejo.",
+            "5 - Su humor es muy sofisticado y conceptual, a menudo incomprendido por otros niños."
+          ]
+        },
+        {
+          texto: "¿A tu hijo/a le gusta investigar y aprender sobre temas que la escuela no cubre, de forma autónoma?",
+          opciones: [
+            "1 - Solo aprende lo que le enseñan.",
+            "2 - A veces busca información adicional.",
+            "3 - Sí, muestra iniciativa en aprender sobre sus intereses fuera del currículum.",
+            "4 - Investiga a fondo temas que le apasionan por su cuenta, como un experto.",
+            "5 - Su aprendizaje autodirigido es constante y profundo, siempre buscando expandir su conocimiento."
+          ]
+        }
+      ],
+      adolescentes: [
+        {
+          texto: "¿Sientes una necesidad constante de innovar, mejorar o encontrar formas originales de hacer las cosas?",
+          opciones: [
+            "1 - No, me adapto a lo que ya existe.",
+            "2 - A veces busco mejorar algo.",
+            "3 - Sí, me gusta proponer ideas nuevas y diferentes.",
+            "4 - Tengo una inclinación natural a cuestionar y reimaginar procesos o sistemas.",
+            "5 - Vivo para la innovación; mi mente está siempre en modo 'rediseño' del mundo."
+          ]
+        },
+        {
+          texto: "¿Tu mente genera muchas ideas diferentes y originales en poco tiempo (fluidez de ideas)?",
+          opciones: [
+            "1 - Mis ideas son pocas y convencionales.",
+            "2 - A veces tengo algunas ideas nuevas.",
+            "3 - Sí, a menudo se me ocurren muchas ideas para cualquier problema.",
+            "4 - Tengo una explosión constante de ideas, incluso en temas no relacionados.",
+            "5 - Mi cerebro es una fábrica de ideas; la cantidad y originalidad es abrumadora."
+          ]
+        },
+        {
+          texto: "¿Eres capaz de ver múltiples soluciones para un mismo problema o diferentes usos para un objeto (flexibilidad de pensamiento)?",
+          opciones: [
+            "1 - Me cuesta ver más de una solución.",
+            "2 - A veces veo algunas alternativas.",
+            "3 - Sí, puedo generar varias opciones diferentes para un desafío.",
+            "4 - Naturalmente exploro un amplio abanico de posibilidades y perspectivas.",
+            "5 - Mi mente es extremadamente flexible, puedo encontrar infinitas soluciones y usos creativos."
+          ]
+        },
+        {
+          texto: "¿Te sientes cómodo/a con la ambigüedad o la falta de estructura, y puedes crear tu propia dirección?",
+          opciones: [
+            "1 - Prefiero la estructura clara.",
+            "2 - Me adapto si es necesario.",
+            "3 - Sí, puedo funcionar bien incluso sin directrices explícitas.",
+            "4 - Disfruto de la libertad de crear mi propio camino y estructura.",
+            "5 - Necesito la falta de estructura para sentirme verdaderamente libre y productivo/a."
+          ]
+        },
+        {
+          texto: "¿Tienes un sentido del humor peculiar, irónico o que a veces no es comprendido por los demás?",
+          opciones: [
+            "1 - Mi humor es convencional.",
+            "2 - A veces hago chistes que pocos entienden.",
+            "3 - Sí, mi humor es más sofisticado o abstracto.",
+            "4 - Disfruto del sarcasmo, la ironía y los juegos de palabras complejos.",
+            "5 - Mi sentido del humor es una parte central de mi pensamiento, a menudo muy avanzado."
+          ]
+        }
+      ],
+      adultos: [
+        {
+          texto: "¿Sientes una necesidad constante de innovar, mejorar o encontrar formas originales de hacer las cosas?",
+          opciones: [
+            "1 - No, me adapto a lo que ya existe.",
+            "2 - A veces busco mejorar algo.",
+            "3 - Sí, me gusta proponer ideas nuevas y diferentes.",
+            "4 - Tengo una inclinación natural a cuestionar y reimaginar procesos o sistemas.",
+            "5 - Vivo para la innovación; mi mente está siempre en modo 'rediseño' del mundo."
+          ]
+        },
+        {
+          texto: "¿Tu mente genera muchas ideas diferentes y originales en poco tiempo (fluidez de ideas)?",
+          opciones: [
+            "1 - Mis ideas son pocas y convencionales.",
+            "2 - A veces tengo algunas ideas nuevas.",
+            "3 - Sí, a menudo se me ocurren muchas ideas para cualquier problema.",
+            "4 - Tengo una explosión constante de ideas, incluso en temas no relacionados.",
+            "5 - Mi cerebro es una fábrica de ideas; la cantidad y originalidad es abrumadora."
+          ]
+        },
+        {
+          texto: "¿Eres capaz de ver múltiples soluciones para un mismo problema o diferentes usos para un objeto (flexibilidad de pensamiento)?",
+          opciones: [
+            "1 - Me cuesta ver más de una solución.",
+            "2 - A veces veo algunas alternativas.",
+            "3 - Sí, puedo generar varias opciones diferentes para un desafío.",
+            "4 - Naturalmente exploro un amplio abanico de posibilidades y perspectivas.",
+            "5 - Mi mente es extremadamente flexible, puedo encontrar infinitas soluciones y usos creativos."
+          ]
+        },
+        {
+          texto: "¿Te sientes cómodo/a con la ambigüedad o la falta de estructura, y puedes crear tu propia dirección?",
+          opciones: [
+            "1 - Prefiero la estructura clara.",
+            "2 - Me adapto si es necesario.",
+            "3 - Sí, puedo funcionar bien incluso sin directrices explícitas.",
+            "4 - Disfruto de la libertad de crear mi propio camino y estructura.",
+            "5 - Necesito la falta de estructura para sentirme verdaderamente libre y productivo/a."
+          ]
+        },
+        {
+          texto: "¿Tienes un sentido del humor peculiar, irónico o que a veces no es comprendido por los demás?",
+          opciones: [
+            "1 - Mi humor es convencional.",
+            "2 - A veces hago chistes que pocos entienden.",
+            "3 - Sí, mi humor es más sofisticado o abstracto.",
+            "4 - Disfruto del sarcasmo, la ironía y los juegos de palabras complejos.",
+            "5 - Mi sentido del humor es una parte central de mi pensamiento, a menudo muy avanzado."
+          ]
+        }
+      ]
+    };
+
+    let indice = 0;
+    const respuestas = Array(5).fill(0); // 5 preguntas por bloque para niños, adolescentes, adultos.
+
+    function mostrarPregunta() {
+      const cont = document.getElementById("pregunta");
+      const actual = preguntas[grupo][indice];
+      let html = `<h3>${actual.texto}</h3>`;
+      actual.opciones.forEach((op, i) => {
+        html += `<button class="btn ${respuestas[indice] === i + 1 ? 'selected' : ''}" onclick="seleccionar(${i + 1})">${op}</button>`;
+      });
+      cont.innerHTML = html;
+      document.getElementById("counter").innerText = `Pregunta ${indice + 1} de ${preguntas[grupo].length}`;
+    }
+
+    function seleccionar(valor) {
+      respuestas[indice] = valor;
+      mostrarPregunta(); // Vuelve a mostrar para actualizar el estado "selected"
+    }
+
+    function siguiente() {
+    // Si todavía quedan preguntas en este bloque
+    if (indice < preguntas[grupo].length - 1) {
+        indice++; // Avanza a la siguiente pregunta
+        mostrarPregunta(); // Muestra la nueva pregunta
+    } else {
+        // Si ya no quedan más preguntas en este bloque:
+        // Paso 1: Guardamos las respuestas de este bloque en localStorage.
+        // Usamos un nombre único para cada bloque, como 'respuestasBloque1', 'respuestasBloque2', etc.
+        localStorage.setItem(`respuestasBloque${bloqueActual}`, JSON.stringify(respuestas));
+        // JSON.stringify() convierte nuestras respuestas (que son un array) en texto que localStorage puede guardar.
+
+        // Paso 2: Redirigimos al usuario al siguiente bloque.
+        window.location.href = `TACI${bloqueActual + 1}-1.html`;
+    }
+}
+
+    function anterior() {
+      if (indice > 0) {
+        indice--;
+        mostrarPregunta();
+      } else {
+        // Si no hay preguntas anteriores en este bloque, regresamos al bloque anterior
+        // o a la página de inicio si estamos en el primer bloque.
+        if (bloqueActual > 1) {
+          window.location.href = `TACI${bloqueActual - 1}-1.html`;
+        } else {
+          window.location.href = 'index.html'; // Si es el bloque 1, regresa al inicio.
+        }
+      }
+    }
+
+    // Al cargar la página, muestra la primera pregunta
+    window.onload = mostrarPregunta;
+  </script>
+
+</body>
+</html>

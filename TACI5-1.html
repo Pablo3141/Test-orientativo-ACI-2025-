@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bloque 5 – Escolaridad / Sistema educativo-laboral</title>
+  <style>
+    body {
+      background-color: #fff9ec;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .question {
+      margin-bottom: 2rem;
+    }
+    .question h3 {
+      font-size: 1.25rem;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #f7f7f7;
+    }
+    .btn.selected {
+      background-color: #d1e7dd;
+      border-color: #0f5132;
+      color: #0f5132;
+      font-weight: bold;
+    }
+    .navigation-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+    .navigation-buttons button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .navigation-buttons button:first-child {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+    .navigation-buttons button:last-child {
+      background-color: #ffc107;
+      color: #333;
+    }
+    #counter {
+      text-align: right;
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div id="counter"></div>
+    <h2>📚💼 Bloque 5: Escolaridad / Sistema educativo-laboral</h2>
+    <div class="question" id="pregunta">
+      </div>
+    <div class="navigation-buttons">
+      <button onclick="anterior()">Anterior</button>
+      <button onclick="siguiente()">Siguiente</button>
+    </div>
+  </div>
+
+  <script>
+    const bloqueActual = 5; // ¡IMPORTANTE: Definimos el número de bloque!
+    const grupo = localStorage.getItem('grupoEtario');
+
+    // Si el grupo etario no está en localStorage (ej. llegó directamente), redirigir al inicio
+    if (!grupo) {
+        window.location.href = 'index.html';
+    }
+
+    const preguntas = {
+      ninos: [
+        {
+          texto: "¿Tu hijo/a muestra aburrimiento o desinterés en la escuela si no se siente desafiado/a?",
+          opciones: [
+            "1 - Disfruta la escuela normalmente.",
+            "2 - A veces se aburre un poco.",
+            "3 - Sí, si no hay retos, pierde el interés.",
+            "4 - Se frustra o se desmotiva notablemente con tareas repetitivas o poco estimulantes.",
+            "5 - La escuela le resulta aburrida o irrelevante la mayor parte del tiempo por falta de desafío."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a ha sido considerado/a 'diferente' o 'peculiar' por compañeros o maestros?",
+          opciones: [
+            "1 - No, se integra bien.",
+            "2 - Ocasionalmente lo han notado.",
+            "3 - Sí, a veces le cuesta encajar o es visto como distinto.",
+            "4 - Ha tenido dificultades para relacionarse o ha sido etiquetado/a por su forma de ser o pensar.",
+            "5 - Se siente un/a inadaptado/a social o escolar, con poca conexión con sus pares."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a tiene dificultades para seguir reglas o rutinas que le parecen ilógicas o sin sentido?",
+          opciones: [
+            "1 - Sigue las reglas sin problema.",
+            "2 - A veces las cuestiona.",
+            "3 - Sí, si no ve un propósito, le cuesta obedecer.",
+            "4 - Se rebela ante la autoridad o las normas que considera irracionales o limitantes.",
+            "5 - Su rechazo a las reglas arbitrarias es una característica central de su personalidad."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a prefiere aprender a su propio ritmo y de formas no convencionales, en lugar de seguir métodos estándar?",
+          opciones: [
+            "1 - Prefiere métodos tradicionales.",
+            "2 - A veces busca otras formas.",
+            "3 - Sí, aprende mejor con sus propios métodos.",
+            "4 - Se frustra con la enseñanza tradicional y busca enfoques alternativos.",
+            "5 - Su forma de aprender es tan única que el sistema educativo formal rara vez le funciona."
+          ]
+        }
+      ],
+      adolescentes: [
+        {
+          texto: "¿Sientes aburrimiento o desmotivación en clases/tareas que no te desafían intelectualmente?",
+          opciones: [
+            "1 - Me adapto bien a cualquier clase.",
+            "2 - A veces me aburro un poco.",
+            "3 - Sí, si no hay un reto, pierdo el interés.",
+            "4 - La falta de desafío intelectual me desmotiva profundamente y afecta mi rendimiento.",
+            "5 - Siento que gran parte del sistema educativo no está hecho para mi forma de pensar."
+          ]
+        },
+        {
+          texto: "¿Te has sentido 'diferente', incomprendido/a o fuera de lugar en el ámbito educativo o social?",
+          opciones: [
+            "1 - Me siento normal y me adapto.",
+            "2 - Ocasionalmente me siento diferente.",
+            "3 - Sí, a veces me cuesta encajar con mis compañeros o en el sistema.",
+            "4 - He tenido experiencias de sentirme incomprendido/a o aislado/a por mi forma de pensar.",
+            "5 - Mi sensación de ser 'distinto/a' es constante y me ha afectado socialmente."
+          ]
+        },
+        {
+          texto: "¿Te cuesta seguir reglas o rutinas que consideras ilógicas, injustas o que limitan tu autonomía?",
+          opciones: [
+            "1 - Sigo las reglas sin problema.",
+            "2 - A veces las cuestiono.",
+            "3 - Sí, tiendo a cuestionar la lógica detrás de las normas.",
+            "4 - Me rebelo ante la autoridad o las estructuras que considero arbitrarias o ineficientes.",
+            "5 - Mi resistencia a las normas irracionales es muy fuerte y me ha causado problemas."
+          ]
+        },
+        {
+          texto: "¿Prefieres aprender a tu propio ritmo y con métodos no convencionales, en lugar de seguir la enseñanza tradicional?",
+          opciones: [
+            "1 - Prefiero métodos tradicionales.",
+            "2 - A veces exploro otras formas.",
+            "3 - Sí, me gusta experimentar con mis propios métodos de estudio.",
+            "4 - Me frustro con los enfoques de enseñanza estándar y busco alternativas creativas.",
+            "5 - Mi forma de aprender es tan particular que los sistemas tradicionales rara vez me satisfacen."
+          ]
+        }
+      ],
+      adultos: [
+        {
+          texto: "¿Sientes aburrimiento o desmotivación en entornos laborales/académicos que no te desafían intelectualmente?",
+          opciones: [
+            "1 - Me adapto bien a cualquier entorno.",
+            "2 - A veces me aburro un poco.",
+            "3 - Sí, si no hay un reto constante, pierdo el interés.",
+            "4 - La falta de desafío intelectual en mi trabajo o estudio me desmotiva profundamente.",
+            "5 - Necesito un entorno que me desafíe constantemente; de lo contrario, mi rendimiento decae drásticamente."
+          ]
+        },
+        {
+          texto: "¿Te has sentido 'diferente', incomprendido/a o fuera de lugar en el ámbito laboral o educativo?",
+          opciones: [
+            "1 - Me siento normal y me adapto.",
+            "2 - Ocasionalmente me siento diferente.",
+            "3 - Sí, a veces me cuesta encajar con colegas o en el sistema establecido.",
+            "4 - He tenido experiencias de sentirme incomprendido/a o aislado/a por mi forma de pensar en el trabajo/estudio.",
+            "5 - Mi sensación de ser 'distinto/a' es una constante en mi vida profesional y/o académica."
+          ]
+        },
+        {
+          texto: "¿Te cuesta seguir reglas o procesos que consideras ilógicos, ineficientes o que limitan tu creatividad?",
+          opciones: [
+            "1 - Sigo las reglas sin problema.",
+            "2 - A veces las cuestiono.",
+            "3 - Sí, tiendo a cuestionar la lógica detrás de las normas o procedimientos.",
+            "4 - Me resisto activamente a las burocracias o procesos que considero irracionales.",
+            "5 - Mi rechazo a las estructuras inflexibles es muy fuerte y me motiva a buscar autonomía."
+          ]
+        },
+        {
+          texto: "¿Fuiste etiquetado/a negativamente (vago, distraído, poco constante) en lugar de entender tu forma de aprender o trabajar?",
+          opciones: [
+            "1 - No, siempre fui entendido.",
+            "2 - Ocasionalmente.",
+            "3 - Frecuentemente.",
+            "4 - Fue algo recurrente en mi historia.",
+            "5 - Toda mi vida fui malinterpretado y etiquetado erróneamente."
+          ]
+        }
+      ]
+    };
+
+    let indice = 0;
+    const respuestas = Array(4).fill(0); // 4 preguntas por bloque para niños, adolescentes, adultos.
+
+    function mostrarPregunta() {
+      const cont = document.getElementById("pregunta");
+      const actual = preguntas[grupo][indice];
+      let html = `<h3>${actual.texto}</h3>`;
+      actual.opciones.forEach((op, i) => {
+        html += `<button class="btn ${respuestas[indice] === i + 1 ? 'selected' : ''}" onclick="seleccionar(${i + 1})">${op}</button>`;
+      });
+      cont.innerHTML = html;
+      document.getElementById("counter").innerText = `Pregunta ${indice + 1} de ${preguntas[grupo].length}`;
+    }
+
+    function seleccionar(valor) {
+      respuestas[indice] = valor;
+      mostrarPregunta(); // Vuelve a mostrar para actualizar el estado "selected"
+    }
+
+    function siguiente() {
+    // Si todavía quedan preguntas en este bloque
+    if (indice < preguntas[grupo].length - 1) {
+        indice++; // Avanza a la siguiente pregunta
+        mostrarPregunta(); // Muestra la nueva pregunta
+    } else {
+        // Si ya no quedan más preguntas en este bloque:
+        // Paso 1: Guardamos las respuestas de este bloque en localStorage.
+        // Usamos un nombre único para cada bloque, como 'respuestasBloque1', 'respuestasBloque2', etc.
+        localStorage.setItem(`respuestasBloque${bloqueActual}`, JSON.stringify(respuestas));
+        // JSON.stringify() convierte nuestras respuestas (que son un array) en texto que localStorage puede guardar.
+
+        // Paso 2: Redirigimos al usuario al siguiente bloque.
+        window.location.href = `TACI${bloqueActual + 1}-1.html`;
+    }
+}
+
+    function anterior() {
+      if (indice > 0) {
+        indice--;
+        mostrarPregunta();
+      } else {
+        // Si no hay preguntas anteriores en este bloque, regresamos al bloque anterior
+        // o a la página de inicio si estamos en el primer bloque.
+        if (bloqueActual > 1) {
+          window.location.href = `TACI${bloqueActual - 1}-1.html`;
+        } else {
+          window.location.href = 'index.html'; // Si es el bloque 1, regresa al inicio.
+        }
+      }
+    }
+
+    // Al cargar la página, muestra la primera pregunta
+    window.onload = mostrarPregunta;
+  </script>
+
+</body>
+</html>

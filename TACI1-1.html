@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bloque 1 – Cognición</title>
+  <style>
+    body {
+      background-color: #fff9ec;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .question {
+      margin-bottom: 2rem;
+    }
+    .question h3 {
+      font-size: 1.25rem;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #f7f7f7;
+    }
+    .btn.selected {
+      background-color: #d1e7dd;
+      border-color: #0f5132;
+      color: #0f5132;
+      font-weight: bold;
+    }
+    .navigation-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+    .navigation-buttons button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .navigation-buttons button:first-child {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+    .navigation-buttons button:last-child {
+      background-color: #ffc107;
+      color: #333;
+    }
+    #counter {
+      text-align: right;
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div id="counter"></div>
+    <h2>🧠 Bloque 1 – Cognición</h2>
+    <div class="question" id="pregunta">
+      </div>
+    <div class="navigation-buttons">
+      <button onclick="anterior()">Anterior</button>
+      <button onclick="siguiente()">Siguiente</button>
+    </div>
+  </div>
+
+  <script>
+    const bloqueActual = 1; // ¡IMPORTANTE: Definimos el número de bloque!
+    const grupo = localStorage.getItem('grupoEtario');
+
+    // Si el grupo etario no está en localStorage (ej. llegó directamente), redirigir al inicio
+    if (!grupo) {
+        window.location.href = 'index.html';
+    }
+
+    const preguntas = {
+      ninos: [
+        {
+          texto: "¿Tu hijo/a muestra una curiosidad inagotable sobre temas complejos para su edad?",
+          opciones: [
+            "1 - No, su curiosidad es normal para su edad.",
+            "2 - A veces hace preguntas un poco más complejas.",
+            "3 - Sí, constantemente pregunta el porqué de cosas que van más allá de lo esperado.",
+            "4 - Se obsesiona con temas específicos y busca información detallada.",
+            "5 - Su nivel de curiosidad y profundidad es excepcional, como un pequeño científico."
+          ]
+        },
+        {
+          texto: "¿Tiene tu hijo/a una memoria excepcional para detalles, historias o datos?",
+          opciones: [
+            "1 - Su memoria es como la de otros niños de su edad.",
+            "2 - A veces recuerda cosas que me sorprenden.",
+            "3 - Sí, su memoria es notablemente buena para su edad.",
+            "4 - Recopila y recuerda una gran cantidad de información sin esfuerzo aparente.",
+            "5 - Su memoria es casi fotográfica o enciclopédica, recordando detalles mínimos."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a prefiere jugar o interactuar con niños mayores o adultos?",
+          opciones: [
+            "1 - No, prefiere jugar con niños de su edad.",
+            "2 - A veces busca interactuar con mayores, pero no es lo habitual.",
+            "3 - Sí, a menudo prefiere la compañía de niños mayores o adultos.",
+            "4 - Busca conversaciones o actividades intelectualmente estimulantes con adultos.",
+            "5 - Se aburre con sus compañeros y solo se siente cómodo con adultos o mayores que lo desafíen."
+          ]
+        },
+        {
+          texto: "¿Aprende tu hijo/a cosas nuevas con mucha rapidez, a veces sin instrucción explícita?",
+          opciones: [
+            "1 - Aprende a un ritmo normal.",
+            "2 - Aprende algunas cosas un poco más rápido.",
+            "3 - Sí, capta conceptos nuevos con una facilidad inusual.",
+            "4 - Aprende por sí mismo/a con poca o ninguna explicación.",
+            "5 - Su ritmo de aprendizaje es extraordinario, casi autodidacta en muchas áreas."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a tiene un vocabulario avanzado o utiliza frases complejas para su edad?",
+          opciones: [
+            "1 - Su vocabulario es normal para su edad.",
+            "2 - Ocasionalmente usa palabras un poco más grandes.",
+            "3 - Sí, tiene un vocabulario amplio y lo usa con precisión.",
+            "4 - Habla con una fluidez y complejidad que sorprende a los adultos.",
+            "5 - Su forma de expresarse es sofisticada, como si fuera mucho mayor."
+          ]
+        }
+      ],
+      adolescentes: [
+        {
+          texto: "¿Tu velocidad de pensamiento es notablemente más rápida que la de tus compañeros?",
+          opciones: [
+            "1 - No lo noto o no creo que sea así.",
+            "2 - Tal vez soy algo rápido, pero no mucho.",
+            "3 - A veces me adelanto en reuniones o conversaciones.",
+            "4 - Me cuesta frenar mi pensamiento, tengo muchas ideas simultáneas.",
+            "5 - Mi velocidad mental suele ser abrumadora o me aísla del entorno."
+          ]
+        },
+        {
+          texto: "¿Tienes la capacidad de aprender conceptos complejos o abstractos con facilidad?",
+          opciones: [
+            "1 - Aprendo al mismo ritmo que los demás.",
+            "2 - Algunas cosas me resultan más fáciles de captar.",
+            "3 - Sí, entiendo ideas abstractas que otros tardan en comprender.",
+            "4 - Me atraen y comprendo fácilmente teorías complejas en diversas áreas.",
+            "5 - No tengo dificultad con ningún concepto complejo; de hecho, me aburren los temas sencillos."
+          ]
+        },
+        {
+          texto: "¿Disfrutas resolviendo problemas que otros consideran muy difíciles o imposibles?",
+          opciones: [
+            "1 - Prefiero problemas sencillos.",
+            "2 - A veces me gustan los desafíos, pero no siempre.",
+            "3 - Sí, me siento atraído por problemas que requieren mucho análisis.",
+            "4 - Busco activamente problemas intrincados y disfruto el proceso de resolución.",
+            "5 - Los problemas más difíciles son los únicos que me mantienen motivado/a."
+          ]
+        },
+        {
+          texto: "¿Eres capaz de ver patrones o conexiones donde otros no los perciben?",
+          opciones: [
+            "1 - No, no es algo que me pase.",
+            "2 - A veces noto conexiones sutiles.",
+            "3 - Sí, con frecuencia veo relaciones entre ideas o datos que parecen inconexos.",
+            "4 - Tengo una habilidad innata para conectar puntos y predecir resultados.",
+            "5 - Mi mente está constantemente buscando patrones y sistemas en todo lo que me rodea."
+          ]
+        },
+        {
+          texto: "¿Tienes un vocabulario extenso y te expresas con gran precisión y elocuencia?",
+          opciones: [
+            "1 - Mi vocabulario es promedio.",
+            "2 - Uso algunas palabras complejas ocasionalmente.",
+            "3 - Sí, me expreso con un vocabulario rico y estructurado.",
+            "4 - Mi forma de hablar es muy precisa y disfruto de los matices del lenguaje.",
+            "5 - Mi expresión oral y escrita es comparable a la de un adulto erudito."
+          ]
+        }
+      ],
+      adultos: [
+        {
+          texto: "¿Tu velocidad de pensamiento es notablemente más rápida que la de los demás?",
+          opciones: [
+            "1 - No lo noto o no creo que sea así.",
+            "2 - Tal vez soy algo rápido, pero no mucho.",
+            "3 - A veces me adelanto en reuniones o conversaciones.",
+            "4 - Me cuesta frenar mi pensamiento, tengo muchas ideas simultáneas.",
+            "5 - Mi velocidad mental suele ser abrumadora o me aísla del entorno."
+          ]
+        },
+        {
+          texto: "¿Tienes la capacidad de aprender conceptos complejos o abstractos con facilidad?",
+          opciones: [
+            "1 - Aprendo al mismo ritmo que los demás.",
+            "2 - Algunas cosas me resultan más fáciles de captar.",
+            "3 - Sí, entiendo ideas abstractas que otros tardan en comprender.",
+            "4 - Me atraen y comprendo fácilmente teorías complejas en diversas áreas.",
+            "5 - No tengo dificultad con ningún concepto complejo; de hecho, me aburren los temas sencillos."
+          ]
+        },
+        {
+          texto: "¿Disfrutas resolviendo problemas que otros consideran muy difíciles o imposibles?",
+          opciones: [
+            "1 - Prefiero problemas sencillos.",
+            "2 - A veces me gustan los desafíos, pero no siempre.",
+            "3 - Sí, me siento atraído por problemas que requieren mucho análisis.",
+            "4 - Busco activamente problemas intrincados y disfruto el proceso de resolución.",
+            "5 - Los problemas más difíciles son los únicos que me mantienen motivado/a."
+          ]
+        },
+        {
+          texto: "¿Eres capaz de ver patrones o conexiones donde otros no los perciben?",
+          opciones: [
+            "1 - No, no es algo que me pase.",
+            "2 - A veces noto conexiones sutiles.",
+            "3 - Sí, con frecuencia veo relaciones entre ideas o datos que parecen inconexos.",
+            "4 - Tengo una habilidad innata para conectar puntos y predecir resultados.",
+            "5 - Mi mente está constantemente buscando patrones y sistemas en todo lo que me rodea."
+          ]
+        },
+        {
+          texto: "¿Tienes un vocabulario extenso y te expresas con gran precisión y elocuencia?",
+          opciones: [
+            "1 - Mi vocabulario es promedio.",
+            "2 - Uso algunas palabras complejas ocasionalmente.",
+            "3 - Sí, me expreso con un vocabulario rico y estructurado.",
+            "4 - Mi forma de hablar es muy precisa y disfruto de los matices del lenguaje.",
+            "5 - Mi expresión oral y escrita es comparable a la de un adulto erudito."
+          ]
+        }
+      ]
+    };
+
+    let indice = 0;
+    const respuestas = Array(5).fill(0); // 5 preguntas por bloque para niños, adolescentes, adultos.
+
+    function mostrarPregunta() {
+      const cont = document.getElementById("pregunta");
+      const actual = preguntas[grupo][indice];
+      let html = `<h3>${actual.texto}</h3>`;
+      actual.opciones.forEach((op, i) => {
+        html += `<button class="btn ${respuestas[indice] === i + 1 ? 'selected' : ''}" onclick="seleccionar(${i + 1})">${op}</button>`;
+      });
+      cont.innerHTML = html;
+      document.getElementById("counter").innerText = `Pregunta ${indice + 1} de ${preguntas[grupo].length}`;
+    }
+
+    function seleccionar(valor) {
+      respuestas[indice] = valor;
+      mostrarPregunta(); // Vuelve a mostrar para actualizar el estado "selected"
+    }
+
+    function siguiente() {
+    // Si todavía quedan preguntas en este bloque
+    if (indice < preguntas[grupo].length - 1) {
+        indice++; // Avanza a la siguiente pregunta
+        mostrarPregunta(); // Muestra la nueva pregunta
+    } else {
+        // Si ya no quedan más preguntas en este bloque:
+        // Paso 1: Guardamos las respuestas de este bloque en localStorage.
+        // Usamos un nombre único para cada bloque, como 'respuestasBloque1', 'respuestasBloque2', etc.
+        localStorage.setItem(`respuestasBloque${bloqueActual}`, JSON.stringify(respuestas));
+        // JSON.stringify() convierte nuestras respuestas (que son un array) en texto que localStorage puede guardar.
+
+        // Paso 2: Redirigimos al usuario al siguiente bloque.
+        window.location.href = `TACI${bloqueActual + 1}-1.html`;
+    }
+}
+
+    function anterior() {
+      if (indice > 0) {
+        indice--;
+        mostrarPregunta();
+      } else {
+        // Si no hay preguntas anteriores en este bloque, regresamos al bloque anterior
+        // o a la página de inicio si estamos en el primer bloque.
+        if (bloqueActual > 1) {
+          window.location.href = `TACI${bloqueActual - 1}-1.html`;
+        } else {
+          window.location.href = 'index.html'; // Si es el bloque 1, regresa al inicio.
+        }
+      }
+    }
+
+    // Al cargar la página, muestra la primera pregunta
+    window.onload = mostrarPregunta;
+  </script>
+
+</body>
+</html>

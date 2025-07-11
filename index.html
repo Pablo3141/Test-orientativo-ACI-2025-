@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio Test ACI</title>
+    <style>
+        body {
+            background-color: #fff9ec;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+        .group-buttons button {
+            display: block;
+            width: 80%;
+            margin: 1rem auto;
+            padding: 1rem 1.5rem;
+            border: none;
+            background: #ffc107;
+            color: #333;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .group-buttons button:hover {
+            background-color: #e0a800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bienvenido al Test de Altas Capacidades Intelectuales</h1>
+        <p>Por favor, selecciona tu grupo etario para comenzar:</p>
+        <div class="group-buttons">
+            <button onclick="iniciarTest('ninos')">Niños (hasta 12 años)</button>
+            <button onclick="iniciarTest('adolescentes')">Adolescentes (13-17 años)</button>
+            <button onclick="iniciarTest('adultos')">Adultos (18+ años)</button>
+        </div>
+    </div>
+
+    <script>
+        function iniciarTest(grupo) {
+            // Guardamos el grupo seleccionado para usarlo en los bloques
+            localStorage.setItem('grupoEtario', grupo);
+            // Redirigimos al primer bloque del test
+            window.location.href = 'TACI1-1.html';
+        }
+    </script>
+</body>
+</html>

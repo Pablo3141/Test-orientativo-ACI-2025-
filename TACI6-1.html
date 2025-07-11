@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bloque 6 – Doble y Triple Excepcionalidad</title>
+  <style>
+    body {
+      background-color: #fff9ec;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    .question {
+      margin-bottom: 2rem;
+    }
+    .question h3 {
+      font-size: 1.25rem;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #f7f7f7;
+    }
+    .btn.selected {
+      background-color: #d1e7dd;
+      border-color: #0f5132;
+      color: #0f5132;
+      font-weight: bold;
+    }
+    .navigation-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2rem;
+    }
+    .navigation-buttons button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .navigation-buttons button:first-child {
+      background-color: #e0e0e0;
+      color: #333;
+    }
+    .navigation-buttons button:last-child {
+      background-color: #ffc107;
+      color: #333;
+    }
+    #counter {
+      text-align: right;
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div id="counter"></div>
+    <h2>3️⃣ⓔ Bloque 6: Doble y Triple Excepcionalidad</h2>
+    <div class="question" id="pregunta">
+      </div>
+    <div class="navigation-buttons">
+      <button onclick="anterior()">Anterior</button>
+      <button onclick="siguiente()">Siguiente</button>
+    </div>
+  </div>
+
+  <script>
+    const bloqueActual = 6; // ¡IMPORTANTE: Definimos el número de bloque!
+    const grupo = localStorage.getItem('grupoEtario');
+
+    // Si el grupo etario no está en localStorage (ej. llegó directamente), redirigir al inicio
+    if (!grupo) {
+        window.location.href = 'index.html';
+    }
+
+    const preguntas = {
+      ninos: [
+        {
+          texto: "¿Tu hijo/a ha sido diagnosticado/a con alguna condición (ej. TDAH, TEA, dislexia) además de sospecha de altas capacidades?",
+          opciones: [
+            "1 - No, solo sospecha de altas capacidades.",
+            "2 - Sí, con una condición.",
+            "3 - Sí, con dos o más condiciones.",
+            "4 - Las condiciones interactúan con sus altas capacidades, generando desafíos y fortalezas únicas.",
+            "5 - Su doble o triple excepcionalidad es una parte central de su identidad y forma de operar."
+          ]
+        },
+        {
+          texto: "¿Notas que tu hijo/a puede tener dificultades en algunas áreas (ej. social, motora) mientras sobresale en otras?",
+          opciones: [
+            "1 - Es equilibrado/a en todas las áreas.",
+            "2 - Algunas pequeñas diferencias.",
+            "3 - Sí, presenta grandes desequilibrios en su desarrollo.",
+            "4 - Sus puntos fuertes son muy destacados, pero también tiene áreas de gran dificultad.",
+            "5 - El contraste entre sus habilidades y sus desafíos es muy marcado y a veces inexplicable."
+          ]
+        },
+        {
+          texto: "¿La escuela de tu hijo/a ha tenido dificultades para entender o apoyar sus necesidades complejas?",
+          opciones: [
+            "1 - La escuela lo/a apoya bien.",
+            "2 - Algunas veces.",
+            "3 - Sí, la escuela no siempre comprende sus particularidades.",
+            "4 - Ha sido un desafío encontrar un entorno educativo que se adapte a su perfil único.",
+            "5 - El sistema educativo tradicional ha sido un obstáculo constante para su desarrollo."
+          ]
+        },
+        {
+          texto: "¿Tu hijo/a tiene intereses muy intensos y enfocados, a veces a expensas de otras actividades?",
+          opciones: [
+            "1 - Sus intereses son variados y equilibrados.",
+            "2 - A veces se enfoca mucho.",
+            "3 - Sí, tiene pasiones muy absorbentes.",
+            "4 - Se sumerge profundamente en sus intereses, mostrando una intensidad y conocimiento inusuales.",
+            "5 - Sus intereses son obsesivos, monopolizando su tiempo y atención, a veces generando aislamiento."
+          ]
+        }
+      ],
+      adolescentes: [
+        {
+          texto: "¿Te has autodiagnosticado o te han diagnosticado con alguna condición (ej. TDAH, TEA, dislexia) además de tus altas capacidades?",
+          opciones: [
+            "1 - No, solo sospecha de altas capacidades.",
+            "2 - Sí, con una condición.",
+            "3 - Sí, con dos o más condiciones.",
+            "4 - Siento que mis condiciones interactúan con mis altas capacidades, generando desafíos y fortalezas únicas.",
+            "5 - Mi doble o triple excepcionalidad es una parte central de mi identidad y forma de operar."
+          ]
+        },
+        {
+          texto: "¿Notas grandes desequilibrios entre tus habilidades (ej. sobresalir en algo, pero tener dificultades sociales)?",
+          opciones: [
+            "1 - Soy equilibrado/a.",
+            "2 - Pequeñas diferencias.",
+            "3 - Sí, presento grandes discrepancias entre mis fortalezas y debilidades.",
+            "4 - Mis habilidades son muy dispares; en un área soy un genio, en otra, tengo dificultades notables.",
+            "5 - El contraste entre mis capacidades y mis desafíos es muy marcado y me genera mucha confusión."
+          ]
+        },
+        {
+          texto: "¿Sientes que el sistema educativo (o social) no comprende tu perfil complejo y tus necesidades únicas?",
+          opciones: [
+            "1 - Me siento comprendido/a.",
+            "2 - A veces no me entienden.",
+            "3 - Sí, siento que mis necesidades no son atendidas.",
+            "4 - He experimentado mucha frustración al no encontrar apoyo o comprensión para mi forma de ser.",
+            "5 - El sistema me ha fallado repetidamente; me siento solo/a en la búsqueda de mi camino."
+          ]
+        },
+        {
+          texto: "¿Tienes intereses muy intensos y enfocados, a veces a expensas de otras actividades o interacciones sociales?",
+          opciones: [
+            "1 - Mis intereses son variados y equilibrados.",
+            "2 - A veces me enfoco mucho.",
+            "3 - Sí, mis pasiones son muy absorbentes.",
+            "4 - Me sumerjo profundamente en mis intereses, mostrando una intensidad y conocimiento inusuales.",
+            "5 - Mis intereses son obsesivos, dominando mi tiempo y atención, a veces afectando mi vida social."
+          ]
+        }
+      ],
+      adultos: [
+        {
+          texto: "¿Te sentís identificado/a con el concepto de doble excepcionalidad (Altas Capacidades + un trastorno o condición)?",
+          opciones: [
+            "1 - No, en absoluto.",
+            "2 - Lo escuché, pero no me representa.",
+            "3 - Me resuena, pero no estoy seguro/a.",
+            "4 - Sí, me identifico bastante con este perfil.",
+            "5 - Me define completamente; siempre supe que había algo más allá de las ACI."
+          ]
+        },
+        {
+          texto: "¿Experimentás grandes desequilibrios entre tus habilidades (ej. un área de genialidad y otra de gran dificultad)?",
+          opciones: [
+            "1 - Soy equilibrado/a en mis habilidades.",
+            "2 - Pequeñas diferencias.",
+            "3 - Sí, noto discrepancias significativas entre mis fortalezas y debilidades.",
+            "4 - Mis capacidades son muy dispares; en un área rindo al máximo, en otra, experimento grandes desafíos.",
+            "5 - El contraste entre mis capacidades y mis dificultades es muy marcado y a menudo es la clave de mi perfil."
+          ]
+        },
+        {
+          texto: "¿Sentís que el sistema (educativo, laboral, social) no comprende tu perfil complejo y tus necesidades únicas?",
+          opciones: [
+            "1 - Me siento comprendido/a.",
+            "2 - A veces no me entienden.",
+            "3 - Sí, mis necesidades no han sido bien atendidas.",
+            "4 - He experimentado mucha frustración al no encontrar apoyo o comprensión para mi forma de ser.",
+            "5 - El sistema me ha fallado repetidamente; me siento solo/a en la búsqueda de mi camino."
+          ]
+        },
+        {
+          texto: "¿Te sentís identificado/a con un perfil de triple excepcionalidad (Altas Capacidades + 2 o más condiciones cognitivas/emocionales)?",
+          opciones: [
+            "1 - No, en absoluto.",
+            "2 - Es una idea que escuché, pero no me representa.",
+            "3 - A veces me siento así.",
+            "4 - Me identifico bastante.",
+            "5 - Me define totalmente y fue una revelación entenderlo."
+          ]
+        }
+      ]
+    };
+
+    let indice = 0;
+    const respuestas = Array(4).fill(0); // 4 preguntas por bloque para niños, adolescentes, adultos.
+
+    function mostrarPregunta() {
+      const cont = document.getElementById("pregunta");
+      const actual = preguntas[grupo][indice];
+      let html = `<h3>${actual.texto}</h3>`;
+      actual.opciones.forEach((op, i) => {
+        html += `<button class="btn ${respuestas[indice] === i + 1 ? 'selected' : ''}" onclick="seleccionar(${i + 1})">${op}</button>`;
+      });
+      cont.innerHTML = html;
+      document.getElementById("counter").innerText = `Pregunta ${indice + 1} de ${preguntas[grupo].length}`;
+    }
+
+    function seleccionar(valor) {
+      respuestas[indice] = valor;
+      mostrarPregunta(); // Vuelve a mostrar para actualizar el estado "selected"
+    }
+
+    function siguiente() {
+    // Si todavía quedan preguntas en este bloque
+    if (indice < preguntas[grupo].length - 1) {
+        indice++; // Avanza a la siguiente pregunta
+        mostrarPregunta(); // Muestra la nueva pregunta
+    } else {
+        // Si ya no quedan más preguntas en este último bloque:
+        // Paso 1: Guardamos las respuestas del último bloque en localStorage.
+        localStorage.setItem(`respuestasBloque${bloqueActual}`, JSON.stringify(respuestas));
+
+        // Paso 2: Redirigimos al usuario a la página final de resultados.
+        window.location.href = 'uResultados-1.html';
+    }
+}
+
+    function anterior() {
+      if (indice > 0) {
+        indice--;
+        mostrarPregunta();
+      } else {
+        // Si no hay preguntas anteriores en este bloque, regresamos al bloque anterior
+        // o a la página de inicio si estamos en el primer bloque.
+        if (bloqueActual > 1) {
+          window.location.href = `TACI${bloqueActual - 1}-1.html`;
+        } else {
+          window.location.href = 'index.html'; // Si es el bloque 1, regresa al inicio.
+        }
+      }
+    }
+
+    // Al cargar la página, muestra la primera pregunta
+    window.onload = mostrarPregunta;
+  </script>
+
+</body>
+</html>
